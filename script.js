@@ -10,9 +10,14 @@ const state = {
   interval: null,
   warningSeconds: 300,
   warningPlayed: false,
+  // Peringatan hampir habis tetap menggunakan suara default.
   warningAudioUrl: null,
-  endAudioUrl: null,
-  logoUrl: null,
+
+  // Sirine hanya digunakan ketika countdown mencapai 00:00.
+  endAudioUrl: "sirine.mp3",
+
+  // Logo bawaan HIMA.
+  logoUrl: "logihima.png",
   audioContext: null,
 };
 
@@ -264,12 +269,20 @@ function playDefault(kind) {
   }
 }
 function playAlert(kind) {
-  const url = kind === "warning" ? state.warningAudioUrl : state.endAudioUrl;
-  if (url) {
-    const audio = new Audio(url);
-    audio.volume = 0.9;
-    audio.play().catch(() => playDefault(kind));
-  } else playDefault(kind);
+  // Peringatan waktu hampir habis.
+  if (kind === "warning") {
+    playDefault("warning");
+    return;
+  }
+
+  // Sirine khusus ketika waktu habis.
+  if (kind === "end") {
+    const siren = new Audio("sirine.mp3");
+    siren.volume = 1;
+    siren.play().catch((error) => {
+      console.error("Sirine gagal diputar:", error);
+    });
+  }
 }
 function openSettings() {
   $("settingsOverlay").classList.remove("hidden");
@@ -358,17 +371,26 @@ $("resetCustomization").addEventListener("click", () => {
   ["logoInput", "warningAudioInput", "endAudioInput"].forEach(
     (id) => ($(id).value = ""),
   );
-  if (state.logoUrl) URL.revokeObjectURL(state.logoUrl);
-  if (state.warningAudioUrl) URL.revokeObjectURL(state.warningAudioUrl);
-  if (state.endAudioUrl) URL.revokeObjectURL(state.endAudioUrl);
-  state.logoUrl = state.warningAudioUrl = state.endAudioUrl = null;
-  $("logoPreview").hidden = true;
-  document.querySelector(".logo-fallback").hidden = false;
-  $("logoFileName").textContent = "Pilih file logo (PNG/JPG/SVG)";
-  $("warningAudioName").textContent =
-    "Gunakan suara bawaan atau pilih file audio";
-  $("endAudioName").textContent = "Gunakan suara bawaan atau pilih file audio";
-  $("soundStatus").textContent = "Suara bawaan aktif";
+
+  if (state.logoUrl !== "assets/logihima.png") {
+    URL.revokeObjectURL(state.logoUrl);
+  }
+
+  state.logoUrl = "logihima.png";
+  state.warningAudioUrl = null;
+  state.endAudioUrl = "sirine.mp3";
+
+  $("logoPreview").src = "assets/logihima.png";
+  $("logoPreview").hidden = false;
+
+  document.querySelector(".logo-fallback").hidden = true;
+
+  $("logoFileName").textContent = "logihima.png · logo aktif";
+  $("warningAudioName").textContent = "Menggunakan suara default";
+  $("endAudioName").textContent = "sirine.mp3 · suara waktu habis";
+
+  $("soundStatus").textContent = "Suara default + sirine";
+
   $("warningInput").value = 5;
   state.warningSeconds = 300;
   state.warningPlayed = false;
