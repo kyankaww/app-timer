@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090909">
+  <title>Timer Tes Tulis — HIMA IBI Kesatuan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="identity">
+        <div class="logo-wrap" id="logoWrap">
+          <div class="logo-fallback">HIMA<br><span>IBI</span></div>
+          <img id="logoPreview" alt="Logo Himpunan" hidden>
+        </div>
+        <div>
+          <p class="eyebrow">HIMPUNAN MAHASISWA</p>
+          <h1>IBI KESATUAN</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="live-clock"><span class="live-dot"></span><span id="clock">--:--:--</span></div>
+        <button class="icon-btn" id="fullscreenBtn" title="Fullscreen (F)" aria-label="Fullscreen">⛶</button>
+        <button class="icon-btn" id="settingsBtn" title="Pengaturan" aria-label="Pengaturan">⚙</button>
+      </div>
+    </header>
+
+    <section class="stage">
+      <div class="event-label">
+        <span class="event-line"></span>
+        <span>TES TULIS CALON ANGGOTA HIMPUNAN</span>
+        <span class="event-line"></span>
+      </div>
+
+      <div class="mode-switch" role="group" aria-label="Mode timer">
+        <button class="mode-btn active" data-mode="countdown">COUNTDOWN</button>
+        <button class="mode-btn" data-mode="stopwatch">STOPWATCH</button>
+      </div>
+
+      <div class="timer-area">
+        <div class="timer-state" id="timerState">SIAP DIMULAI</div>
+        <div class="timer" id="timer" aria-live="off">60:00</div>
+        <div class="timer-caption" id="timerCaption">WAKTU TERSISA</div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-meta">
+          <span id="progressStart">00:00</span>
+          <span id="progressEnd">60:00</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="control-btn primary" id="startBtn"><span>▶</span> START</button>
+        <button class="control-btn" id="pauseBtn" disabled><span>Ⅱ</span> PAUSE</button>
+        <button class="control-btn" id="resumeBtn" disabled><span>▶</span> RESUME</button>
+        <button class="control-btn reset" id="resetBtn"><span>↻</span> RESET</button>
+      </div>
+
+      <div class="quick-settings">
+        <label class="duration-control" id="durationControl">
+          <span>DURASI TES</span>
+          <div class="duration-inputs">
+            <input id="minutesInput" type="number" min="0" max="999" value="60" aria-label="Menit">
+            <span>:</span>
+            <input id="secondsInput" type="number" min="0" max="59" value="0" aria-label="Detik">
+          </div>
+          <small>MENIT : DETIK</small>
+        </label>
+        <div class="quick-divider"></div>
+        <div class="sound-status">
+          <span class="sound-icon">♫</span>
+          <div><strong>PERINGATAN SUARA</strong><small id="soundStatus">Suara bawaan aktif</small></div>
+          <button class="text-btn" id="testSoundBtn">TES SUARA</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>HIMPUNAN MAHASISWA IBI KESATUAN</span>
+      <span class="footer-center">DISCIPLINE · INTEGRITY · COLLABORATION</span>
+      <span id="footerStatus">SYSTEM READY</span>
+    </footer>
+  </main>
+
+  <div class="overlay hidden" id="settingsOverlay">
+    <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="panel-head">
+        <div><p class="eyebrow">CONTROL CENTER</p><h2 id="settingsTitle">Pengaturan Timer</h2></div>
+        <button class="icon-btn close-btn" id="closeSettings" aria-label="Tutup">×</button>
+      </div>
+
+      <div class="setting-section">
+        <h3>IDENTITAS KEGIATAN</h3>
+        <label class="file-field"><span>Logo himpunan</span><input type="file" id="logoInput" accept="image/*"><small id="logoFileName">Pilih file logo (PNG/JPG/SVG)</small></label>
+      </div>
+
+      <div class="setting-section">
+        <h3>DURASI & PERINGATAN</h3>
+        <label class="field-row"><span>Peringatan sebelum waktu habis</span><div class="inline-input"><input id="warningInput" type="number" min="0" max="999" value="5"><span>menit</span></div></label>
+        <p class="hint">Peringatan berbunyi sekali saat waktu tersisa mencapai batas ini. Isi 0 untuk menonaktifkan.</p>
+      </div>
+
+      <div class="setting-section">
+        <h3>KUSTOMISASI SUARA</h3>
+        <label class="file-field"><span>Suara peringatan</span><input type="file" id="warningAudioInput" accept="audio/*"><small id="warningAudioName">Gunakan suara bawaan atau pilih file audio</small></label>
+        <label class="file-field"><span>Suara waktu habis</span><input type="file" id="endAudioInput" accept="audio/*"><small id="endAudioName">Gunakan suara bawaan atau pilih file audio</small></label>
+        <p class="hint">Format audio mengikuti dukungan browser (misalnya MP3, WAV, atau OGG). Audio diputar dari perangkat yang menjalankan timer.</p>
+      </div>
+
+      <div class="panel-actions">
+        <button class="control-btn" id="resetCustomization">KEMBALIKAN DEFAULT</button>
+        <button class="control-btn primary" id="doneSettings">SELESAI</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="announcement hidden" id="announcement" role="alert">
+    <div class="announcement-mark" id="announcementMark">!</div>
+    <div><strong id="announcementTitle">PERINGATAN</strong><p id="announcementText">Waktu hampir habis.</p></div>
+    <button id="dismissAnnouncement" aria-label="Tutup">×</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
